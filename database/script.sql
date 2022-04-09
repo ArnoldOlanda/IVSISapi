@@ -20,8 +20,9 @@ create table usuario(
     password_ varchar(255) not null,
     id_direccion int,
     id_grupo int,
+    estado tinyint default 1,
     primary key(id),
     foreign key(id_direccion) references direcciones(id),
     foreign key(id_grupo) references grupos(id)
 ); 
-
+drop table usuario

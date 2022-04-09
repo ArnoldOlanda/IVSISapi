@@ -43,7 +43,7 @@ class Server{
 
     routes(){
         this.app.get(this.indexPath, (req,res)=>{
-            res.send("IVSI APP api - conected! :v")
+            res.json({msg:"IVSI APP api - conected! :v"})
         })
         this.app.use(this.authPath, routerAuth )
         this.app.use(this.userPaths, routerUser )
