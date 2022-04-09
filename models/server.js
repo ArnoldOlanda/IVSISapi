@@ -16,6 +16,7 @@ class Server{
         this.port = process.env.PORT || 5000;
         this.userPaths = '/api/usuarios';
         this.authPath = '/api/auth';
+        this.indexPath = '/api';
 
         //this.database();
         
@@ -41,6 +42,9 @@ class Server{
     }
 
     routes(){
+        this.app.get(this.indexPath, (req,res)=>{
+            res.send("IVSI APP api - conected! :v")
+        })
         this.app.use(this.authPath, routerAuth )
         this.app.use(this.userPaths, routerUser )
     }
