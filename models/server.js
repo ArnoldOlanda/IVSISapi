@@ -3,7 +3,7 @@ const express = require('express')
 const cors = require('cors');
 const routerAuth = require('../routes/auth');
 const routerUser = require('../routes/users');
-const { dbConnection } = require('../database/config');
+const { query } = require('../database/config');
 
 class Server{
     
@@ -17,7 +17,7 @@ class Server{
         this.userPaths = '/api/usuarios';
         this.authPath = '/api/auth';
 
-        this.database();
+        //this.database();
         
         //Middlewares
         this.middlewares();
@@ -25,9 +25,9 @@ class Server{
         //Routes
         this.routes();
     }
-    async database (){
-        await dbConnection();
-    }
+    // async database (){
+    //     await dbConnection();
+    // }
 
     middlewares(){
         //Cors

@@ -1,97 +1,96 @@
-
+//@ts-check
 const bcryptjs = require('bcryptjs');
 const { response, request } = require('express');
-const req = require('express/lib/request');
 const { generarJWT } = require('../helpers/generarJWT');
-const { googleVerify } = require('../helpers/googleVerify');
 const Usuario = require('../models/usuario');
+const { query } = require('../database/config')
 
 
 const login = async (req = request,res=response )  =>{
     
-    const { correo,password } = req.body;
+    const { usuario,password } = req.body;
 
     try {
 
         //Verificar si el email existe
-        const usuario = await Usuario.findOne({correo})
+        const usuarioDb = await query(`select * from usuario where nombre_usuario = "${ usuario}"`);
         
-        if(!usuario) return res.status(400).json({
-            msg:'Usuario/password incorrectos - correo'
+        if(!usuarioDb[0]) return res.status(400).json({
+             msg:'El usuario no existe'
         })
-        
+        //res.json(usuarioDb[0])
         //Si el usuario esta activo
-        if (!usuario.estado) return res.status(400).json({
+        if (!usuarioDb[0].estado) return res.status(400).json({
             msg:'Usuario/password incorrectos - estado'
         })
         //Verificar el password
-        const validaPassword = bcryptjs.compareSync( password,usuario.password );
-        if(!validaPassword) return res.status(400).json({
-            msg:'Usuario/password incorrectos - password'
-        })
+        // const validaPassword = bcryptjs.compareSync( password,usuarioDb[0].password_ );
+        // if(!validaPassword) return res.status(400).json({
+        //     msg:'Usuario/password incorrectos - password'
+        // })
         // Generar el jwt
-        const token = await generarJWT( usuario.id )
+        const token = await generarJWT( usuarioDb[0].id )
 
         res.json({
-            usuario,
+            usuario:usuarioDb[0],
             token
         })
     } catch (error) {
         console.log( error );
         return res.status(500).json({
-            msg: 'Hable con el administrador'
+            msg: 'Ha ocurrido un error hable con el administrador'
         })
     }
 
 }
 
-const googleSignIn = async (req, res=response ) =>{
-    const { id_token } = req.body
+// const googleSignIn = async (req, res=response ) =>{
+//     const { id_token } = req.body
 
-    try {
+//     try {
 
-        const { name,email,picture } = await googleVerify( id_token );
+//         const { name,email,picture } = await googleVerify( id_token );
 
-        let usuario = await Usuario.findOne({ correo:email })
+//         let usuario = await Usuario.findOne({ correo:email })
 
-        if(!usuario){
-            const data = {
-                nombre:name,
-                correo:email,
-                password:':v',
-                img:picture,
-                google:true,
-                rol:'USER_ROLE'
-            }
-            usuario = new Usuario(data)
-            console.log(usuario);
-            await usuario.save();
-        }
+//         if(!usuario){
+//             const data = {
+//                 nombre:name,
+//                 correo:email,
+//                 password:':v',
+//                 img:picture,
+//                 google:true,
+//                 rol:'USER_ROLE'
+//             }
+//             usuario = new Usuario(data)
+//             console.log(usuario);
+//             await usuario.save();
+//         }
 
-        if(!usuario.estado){
-            return res.status(401).json({
-                msg:'Usuario no activo'
-            })
-        }
+//         if(!usuario.estado){
+//             return res.status(401).json({
+//                 msg:'Usuario no activo'
+//             })
+//         }
 
-        // Generar el jwt
-        const token = await generarJWT( usuario.id )
+//         // Generar el jwt
+//         const token = await generarJWT( usuario.id )
 
-        res.json({
-            usuario,
-            token
-        })
-    } catch (error) {
-        console.log(error);
-        res.status(400).json({
-            ok:'false',
-            msg:'No se pudo verificar el token'
-        })
-    }
+//         res.json({
+//             usuario,
+//             token
+//         })
+//     } catch (error) {
+//         console.log(error);
+//         res.status(400).json({
+//             ok:'false',
+//             msg:'No se pudo verificar el token'
+//         })
+//     }
 
-} 
+// } 
 
 module.exports = {
     login,
-    googleSignIn
+    //googleSignIn
 }

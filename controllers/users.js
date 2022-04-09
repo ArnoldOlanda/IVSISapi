@@ -3,62 +3,77 @@
 const { request, response } = require("express");
 const bcryptjs = require('bcryptjs')
 const Usuario = require("../models/usuario");
+const Direccion = require("../models/direccion");
 
 
 module.exports={
     getUser: async (req = request, res = response) => {
-        const { limite = 5, desde = 0 } = req.query;
+        //const { limite = 5, desde = 0 } = req.query;
+        try {
+            const data = await Usuario.listar();
 
-        const [ total, usuarios ] = await Promise.all([
-            Usuario.countDocuments({ estado:true }),   
-            Usuario.find({ estado:true })
-                .skip( Number(desde) )
-                .limit( Number(limite) )
-        ])
-  
-        res.json({ total, usuarios })
+            return res.json({
+                data
+            })
+        } catch (error) {
+            
+        }
+        
     },
     postUser: async (req = request, res = response) => {
         
-        const { nombre, correo, password, rol } = req.body
-        const usuario = new Usuario({ 
-            nombre,
-            correo,
-            password,
-            rol
-        });
+        try {
+            const { nombre, usuario, password, direccion } = req.body
 
-        //Encriptar el password
-        const salt = bcryptjs.genSaltSync();
-        usuario.password = bcryptjs.hashSync( password, salt );
+            const salt = bcryptjs.genSaltSync()
+            const password_ = bcryptjs.hashSync( password, salt )
         
-        //Guardar
-         await usuario.save()
+            await Direccion.registrar(direccion)
+            const idDireccion = await Direccion.buscar(direccion)
+            await Usuario.registrar({ nombre, usuario, password_,idDireccion })
+
+            return res.json({
+                msg:"Usuario registrado"
+            })
+
+        } catch (error) {
+            return res.status(400).json({
+                err:"Ocurrio un error al intentar registrar al usuario hable con el administrador"
+            })
+        }
         
-        res.json({ msg:"post API", usuario })
     },
     putUser: async (req = request, res = response) => {
-        const { id } = req.params
-        const { _id, password, google, correo, ...resto } = req.body;
+        // const { id } = req.params
+        // const { _id, password, usuario, ...resto } = req.body;
 
-        if ( password ) {
-            //Encriptar el password
-            const salt = bcryptjs.genSaltSync();
-            resto.password = bcryptjs.hashSync( password, salt );
-        }
-
-        const usuario = await Usuario.findByIdAndUpdate( id, resto ); 
-
-        res.json({ msg:"put API", params:req.params.id, usuario })
+        // if ( password ) {
+        //     //Encriptar el password
+        //     const salt = bcryptjs.genSaltSync();
+        //     resto.password = bcryptjs.hashSync( password, salt );
+        // }
+        // const user = Usuario.actualizar()
     },
 
-    deleteUser:async(req = request, res = response) => {
+    deleteUser: async (req = request, res = response) => {
         const { id } = req.params
 
-        //Borrado fisico de la base de datos
-        //const usuario = await Usuario.findByIdAndDelete(id)
+        try {
+            const user = await Usuario.eliminar( id )
+            if(!user){
+                return res.status(400).json({
+                    err:"Ocurrio un error al intentar eliminar al usuario hable con el administrador"
+                })
+            }
 
-        const usuario = await Usuario.findByIdAndUpdate( id, { estado:false })
-        res.json({ usuario })
+            return res.json({
+                msg:"Usuario eliminado"
+            })
+        } catch (error) {
+            return res.status(400).json({
+                err:"Ocurrio un error al intentar eliminar al usuario hable con el administrador"
+            })
+        }
+
     }
 }
