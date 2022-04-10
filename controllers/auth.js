@@ -24,10 +24,10 @@ const login = async (req = request,res=response )  =>{
             msg:'Usuario/password incorrectos - estado'
         })
         //Verificar el password
-        // const validaPassword = bcryptjs.compareSync( password,usuarioDb[0].password_ );
-        // if(!validaPassword) return res.status(400).json({
-        //     msg:'Usuario/password incorrectos - password'
-        // })
+        const validaPassword = bcryptjs.compareSync( password,usuarioDb[0].password_ );
+        if(!validaPassword) return res.status(400).json({
+             msg:'Usuario/password incorrectos - password'
+        })
         // Generar el jwt
         const token = await generarJWT( usuarioDb[0].id )
 
