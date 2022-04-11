@@ -21,12 +21,13 @@ const login = async (req = request,res=response )  =>{
         //res.json(usuarioDb[0])
         //Si el usuario esta activo
         if (!usuarioDb[0].estado) return res.status(400).json({
-            msg:'Usuario/password incorrectos - estado'
+            msg:'Este usuario no se encuentra registrado en la base de datos'
         })
+        
         //Verificar el password
         const validaPassword = bcryptjs.compareSync( password,usuarioDb[0].password_ );
         if(!validaPassword) return res.status(400).json({
-             msg:'Usuario/password incorrectos - password'
+             msg:'El password proporcionado para el usuario es incorrecto'
         })
         // Generar el jwt
         const token = await generarJWT( usuarioDb[0].id )
