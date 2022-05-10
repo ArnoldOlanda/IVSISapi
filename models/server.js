@@ -3,8 +3,7 @@ const express = require('express')
 const cors = require('cors');
 const routerAuth = require('../routes/auth');
 const routerUser = require('../routes/users');
-const { query } = require('../database/config');
-
+const routerGrupos = require('../routes/grupo');
 class Server{
     
     app;
@@ -14,11 +13,10 @@ class Server{
     constructor(){
         this.app = express();
         this.port = process.env.PORT || 5000;
+        this.indexPath = '/api';
         this.userPaths = '/api/usuarios';
         this.authPath = '/api/auth';
-        this.indexPath = '/api';
-
-        //this.database();
+        this.grupoPath = '/api/grupo';
         
         //Middlewares
         this.middlewares();
@@ -26,9 +24,6 @@ class Server{
         //Routes
         this.routes();
     }
-    // async database (){
-    //     await dbConnection();
-    // }
 
     middlewares(){
         //Cors
@@ -43,10 +38,11 @@ class Server{
 
     routes(){
         this.app.get(this.indexPath, (req,res)=>{
-            res.json({msg:"IVSI APP api - conected! :v"})
+            res.json({msg:"IVSI APP api - conected!"})
         })
         this.app.use(this.authPath, routerAuth )
         this.app.use(this.userPaths, routerUser )
+        this.app.use(this.grupoPath, routerGrupos )
     }
 
     listen(){
