@@ -3,6 +3,7 @@
 const { request, response } = require("express");
 const bcryptjs = require('bcryptjs')
 const Grupo = require("../models/grupo");
+const Contacto = require("../models/contacto");
 
 
 
@@ -43,18 +44,33 @@ module.exports={
     postGrupo: async (req = request, res = response) => {
         
         try {
-            const { nombre, password, maxUser,idAdmin } = req.body
+            const { nombre, password, maxUser, idAdmin, contactos } = req.body
 
+            //Encriptado del password
             const salt = bcryptjs.genSaltSync()
             const password_ = bcryptjs.hashSync( password, salt )
         
-            await Grupo.registrar({ nombre, password_, maxUser,idAdmin })
+            //@ts-ignore
+            const { insertId } = await Grupo.registrar({ nombre, password_ , maxUser, idAdmin })
+            
+            if(!(contactos.length < 1)){ //Registramos la lista de contactos en caso no este vacia 
+                contactos.forEach( async ( element ) => {
+                    await Contacto.registrar({ 
+                        nombre:element.nombre,
+                        numero:element.numero,
+                        idGrupo:parseInt( insertId )
+                    });
+                });
+            }
 
             return res.json({
                 msg:"Grupo registrado"
             })
 
         } catch (error) {
+
+            console.log(error);
+
             return res.status(400).json({
                 err:"Ocurrio un error al intentar registrar el grupo hable con el administrador"
             })

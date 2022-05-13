@@ -4,11 +4,11 @@ module.exports = class {
     static async registrar(data = {}){
         try {
             const {nombre, password_, maxUser, idAdmin } = data
-            await query(`
+            const results = await query(`
                 insert into grupos (nombre,  password_, usuarios_max, id_admin) 
                 values ("${ nombre }","${ password_ }",${ maxUser },${ idAdmin });`)
 
-            return true
+            return results
         } catch (error) {
            console.log(error);
            throw error  

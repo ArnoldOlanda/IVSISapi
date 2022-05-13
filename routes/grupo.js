@@ -23,6 +23,7 @@ router.post   ('/',[
     check('maxUser','EL numero maximo de miembros debe ser numerico').isNumeric(),
     check('idAdmin','El campo es obligatorio').not().isEmpty(),
     check('idAdmin','El valor tiene que ser numerico').isNumeric(),
+    check('contactos','Este campo debe ser un array de objetos').isArray(),
     validarCampos //Captura todos los errores y los muestra
 
 ], postGrupo )
