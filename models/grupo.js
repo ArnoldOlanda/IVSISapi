@@ -43,7 +43,9 @@ module.exports = class {
 
     static async eliminar(id){
         try {
-            await query(`delete from contactos_grupo where id_grupo=${id}; delete from grupos where id=${ id }`)
+            await query(`delete from contactos_grupo where id_grupo=${id};`)
+            await query(`delete from grupos where id=${ id }`);
+            
             return true
         } catch (error) {
             console.log(error);
