@@ -1,6 +1,6 @@
 const { Router } = require ('express');
 const { check } = require('express-validator');
-const { getUser, postUser, putUser, deleteUser, putContactsUser, putNotificationToken, putJoinGroup } = require('../controllers/users');
+const { getUser, postUser, putUser, deleteUser, putContactsUser, putNotificationToken, putJoinGroup, getListaContactos } = require('../controllers/users');
 
 const { 
     validarCampos,
@@ -15,6 +15,11 @@ const router = Router();
 router.get    ('/',[
     validarJWT
 ], getUser )
+
+router.get('/contactos/:id',[
+    check('id').custom(existeUsuarioId),
+    validarCampos
+],getListaContactos)
 
 router.post   ('/',[
     check('nombre','El nombre es obligatorio').not().isEmpty(),

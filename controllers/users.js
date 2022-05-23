@@ -22,6 +22,19 @@ module.exports={
         }
         
     },
+    getListaContactos: async (req = request, res = response)=> {
+        const {id} = req.params
+        try {
+            const data = await Contacto.listarContactosUsuario( id );
+            console.log(data);
+            return res.json({
+                data
+            })
+
+        } catch (error) {
+            
+        }
+    },
     postUser: async (req = request, res = response) => {
         
         try {
