@@ -1,6 +1,6 @@
 const { Router } = require ('express');
 const { check } = require('express-validator');
-const { getUser, postUser, putUser, deleteUser } = require('../controllers/users');
+const { getUser, postUser, putUser, deleteUser, putContactsUser, putNotificationToken, putJoinGroup } = require('../controllers/users');
 
 const { 
     validarCampos,
@@ -25,11 +25,25 @@ router.post   ('/',[
 
 ], postUser )
 
-router.put('/:id',[
+router.put('/addContact/:id',[
     check( 'id','No es un ID valido' ).isNumeric(),
     check( 'id' ).custom( existeUsuarioId ),
     validarCampos
-], putUser )
+], putContactsUser )
+
+router.put('/updateNotificationToken',[
+    check( 'id','No es un ID valido' ).isNumeric(),
+    check( 'id' ).custom( existeUsuarioId ),
+    check('token','El token debe ser una cadena de texto').isString(),
+    validarCampos
+], putNotificationToken )
+
+router.put('/joinGroup',[
+    check('usuario','No es un ID valido').isNumeric(),
+    check('usuario').custom( existeUsuarioId ),
+    check('grupo').isString(),
+    validarCampos
+],putJoinGroup)
 
 router.delete ('/:id',[
     validarJWT,

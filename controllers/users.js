@@ -1,9 +1,11 @@
-//@ts-check
+let admin = require('firebase-admin');
 
 const { request, response } = require("express");
 const bcryptjs = require('bcryptjs')
 const Usuario = require("../models/usuario");
 const Direccion = require("../models/direccion");
+const Contacto = require("../models/contacto");
+const Grupo = require("../models/grupo");
 
 
 module.exports={
@@ -43,17 +45,6 @@ module.exports={
         }
         
     },
-    putUser: async (req = request, res = response) => {
-        // const { id } = req.params
-        // const { _id, password, usuario, ...resto } = req.body;
-
-        // if ( password ) {
-        //     //Encriptar el password
-        //     const salt = bcryptjs.genSaltSync();
-        //     resto.password = bcryptjs.hashSync( password, salt );
-        // }
-        // const user = Usuario.actualizar()
-    },
 
     deleteUser: async (req = request, res = response) => {
         const { id } = req.params
@@ -75,5 +66,103 @@ module.exports={
             })
         }
 
+    },
+
+    putContactsUser : async (req = request, res = response) => {
+        const { id } = req.params
+        const { nombre, numero } = req.body
+        
+        try {
+
+            await Contacto.registrar({
+                nombre,
+                numero,
+                para:'usuario',
+                id
+            });
+
+            res.json({
+                msg:"Contacto registrado"
+            })
+        } catch (error) {
+            return res.status(400).json({
+                err:"Ocurrio un error hable con el administrador"
+            })
+        }
+    },
+
+    putNotificationToken : async (req = request, res = response) => {
+        const { id, token } = req.body
+        
+        try {
+            await Usuario.actualizarNotificacionToken(id,token)
+            res.json({
+                msg:"Token de notificacion actualizado"
+            })
+        } catch (error) {
+            return res.status(400).json({
+                err:"Ocurrio un error hable con el administrador"
+            }) 
+        }
+    },
+    putJoinGroup: async ( req = request, res = response ) => {
+
+        const { usuario, grupo, password } = req.body
+        
+        try {
+            
+            const userDb = await Usuario.buscar(usuario)
+            const grupoDb = await Grupo.query(grupo);
+            console.log(userDb);
+            const passwordValido = await bcryptjs.compare(password,grupoDb.password_)
+
+            if(passwordValido){
+
+                const rows = await Usuario.ingresarGrupo(usuario,grupoDb.id);
+                
+                const {notif_token} = rows[0]
+                console.log();
+                if (notif_token != null) {
+                    const message = {
+                        //tokens: [''],
+                        notification: {
+                          body: userDb.nombre_completo + ' ingreso al grupo que administras',
+                          title: 'Ivsis App',
+                        },
+                        apns: {
+                          payload: {
+                            aps: { 'mutable-content': 1 },
+                          },
+                          fcm_options: { image: 'image-url' },
+                        },
+                        android: {
+                          notification: { image: 'image-url' },
+                        },
+                        token:notif_token
+                      };
+            
+                    await admin.messaging()
+                    //@ts-ignore
+                    .send(message)    
+                    .then(response=>{
+                        console.log("mensaje enviado");
+                    })
+                    .catch(console.log)
+                }
+                
+                return res.json({
+                    msg:"Operacion exitosa"
+                })
+            }
+            res.status(400).json({
+                err:"El password no es valido"
+            })
+            
+        } catch (error) {
+            console.log(error);
+            return res.status(400).json({
+                err:"Ocurrio un error hable con el administrador"
+            }) 
+        }
     }
 }

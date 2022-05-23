@@ -6,6 +6,7 @@ const Usuario = require('../models/usuario');
 const { query } = require('../database/config')
 
 
+
 const login = async (req = request,res=response )  =>{
     
     const { usuario,password } = req.body;
@@ -18,7 +19,7 @@ const login = async (req = request,res=response )  =>{
         if(!usuarioDb[0]) return res.status(400).json({
              msg:'El usuario no existe'
         })
-        //res.json(usuarioDb[0])
+
         //Si el usuario esta activo
         if (!usuarioDb[0].estado) return res.status(400).json({
             msg:'Este usuario no se encuentra registrado en la base de datos'
@@ -31,6 +32,7 @@ const login = async (req = request,res=response )  =>{
         })
         // Generar el jwt
         const token = await generarJWT( usuarioDb[0].id )
+
 
         res.json({
             usuario:usuarioDb[0],

@@ -3,12 +3,20 @@ const { query } = require("../database/config")
 module.exports = class {
     static async registrar(data = {}){
         try {
-            const { nombre, numero, idGrupo } = data
-            await query(`
-                insert into contactos_grupo(id_grupo, nombre, numero ) 
-                values ( ${ idGrupo }, "${ nombre }", "${ numero }");`);
+            const { nombre, numero, para, id } = data
 
-            return true
+            const rows = await query(`insert into contactos( nombre, numero ) values ( "${ nombre }", "${ numero }");`);
+
+            if(para === 'usuario') {
+                console.log("usuario");
+                this.vinculaContactoUsuario(id, rows)
+            }else {
+                console.log("grupo");
+                this.vinculaContactoGrupo(id, rows)
+            }
+
+            return true;
+
         } catch (error) {
            console.log(error);
            throw error  
@@ -28,11 +36,12 @@ module.exports = class {
 
     static async actualizar(data={}){
 
-        const { nombre, numero, idGrupo } = data
+        const { nombre, numero, id } = data
 
         try {
-            await query(`update contactos_grupo set nombre="${ nombre }",numero="${ numero }" where id=${parseInt(idGrupo)}`);
-            return true;
+            const rows = await query(`update contactos set nombre="${ nombre }",numero="${ numero }" where id=${ parseInt(id) }`);
+
+            return rows;
 
         } catch (error) {
             
@@ -45,8 +54,8 @@ module.exports = class {
     static async eliminar(id){
         try {
 
-            await query(`delete from contactos_grupo where id=${ id }`)
-            return true;
+            const rows = await query(`delete from contactos where id=${ id }`)
+            return rows;
 
         } catch (error) {
             
@@ -58,7 +67,9 @@ module.exports = class {
 
     static async buscar(id){
         try {
-            const [ contacto ] = await query(`select * from grupos where id=${ id }`);
+            
+            const [ contacto ] = await query(`select * from contactos where id=${ id }`);
+            
             return contacto;
 
         } catch (error) {
@@ -66,6 +77,30 @@ module.exports = class {
             console.log(error);
             throw error;
 
+        }
+    }
+
+    static async vinculaContactoUsuario (id, rows) {
+        const { insertId } = rows
+        try {
+            await query(`insert into contactos_usuario (id_usuario,id_contacto) values(${ parseInt(id) }, ${ parseInt(insertId) })`)
+
+            return true;
+        } catch (error) {
+            console.log(error);
+            throw error;
+        }
+    }
+
+    static async vinculaContactoGrupo (id, rows) {
+        const { insertId } = rows
+        try {
+            await query(`insert into contactos_grupo (id_grupo,id_contacto) values(${ parseInt(id) }, ${ parseInt(insertId) })`)
+
+            return true;
+        } catch (error) {
+            console.log(error);
+            throw error;
         }
     }
 }

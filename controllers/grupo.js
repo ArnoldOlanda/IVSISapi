@@ -58,7 +58,8 @@ module.exports={
                     await Contacto.registrar({ 
                         nombre:element.nombre,
                         numero:element.numero,
-                        idGrupo:parseInt( insertId )
+                        para:'grupo',
+                        id:parseInt( insertId )
                     });
                 });
             }
