@@ -73,4 +73,16 @@ module.exports = class {
             throw error
         }
     }
+
+    static async addContact (grupo,contacto){
+        try {
+            const rows = await query(`insert into contactos_grupo(id_grupo,id_contacto) 
+            values(${grupo},${contacto})`);
+
+            return rows
+        } catch (error) {
+            console.log(error);
+            throw error
+        }
+    }
 }

@@ -36,7 +36,7 @@ module.exports = class {
 
     static async listarContactosUsuario( id ){
         try {
-            const rows = await query(`select c.nombre, c.numero from contactos c 
+            const rows = await query(`select c.id, c.nombre, c.numero from contactos c 
             inner join contactos_usuario cu on cu.id_contacto = c.id
             where cu.id_usuario=${ id }`)
             

@@ -55,12 +55,7 @@ module.exports={
             
             if(!(contactos.length < 1)){ //Registramos la lista de contactos en caso no este vacia 
                 contactos.forEach( async ( element ) => {
-                    await Contacto.registrar({ 
-                        nombre:element.nombre,
-                        numero:element.numero,
-                        para:'grupo',
-                        id:parseInt( insertId )
-                    });
+                    await Grupo.addContact(insertId,element);
                 });
             }
 
