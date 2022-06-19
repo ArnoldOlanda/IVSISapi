@@ -55,7 +55,11 @@ module.exports={
             
             if(!(contactos.length < 1)){ //Registramos la lista de contactos en caso no este vacia 
                 contactos.forEach( async ( element ) => {
-                    await Grupo.addContact(insertId,element);
+
+                    const { nombre, numero } = element;
+
+                    await Grupo.addContact(insertId, nombre, numero);
+                
                 });
             }
 
@@ -74,15 +78,24 @@ module.exports={
         
     },
     putGrupo: async (req = request, res = response) => {
-        // const { id } = req.params
-        // const { _id, password, usuario, ...resto } = req.body;
+        try {
+            const { id } = req.params
+            const { nombre } = req.body;
 
-        // if ( password ) {
-        //     //Encriptar el password
-        //     const salt = bcryptjs.genSaltSync();
-        //     resto.password = bcryptjs.hashSync( password, salt );
-        // }
-        // const user = Usuario.actualizar()
+            const results = await Grupo.actualizar({ nombre, id })
+
+            console.log(results);
+            return res.json({
+                msg:"Informacion de grupo actualizada"
+            })
+            
+
+        } catch (error) {
+            console.log(error);
+            return res.status(400).json({
+                err:"Ocurrio un error al intentar eliminar al usuario hable con el administrador"
+            })
+        }
     },
 
     deleteGrupo: async (req = request, res = response) => {

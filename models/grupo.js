@@ -28,13 +28,12 @@ module.exports = class {
 
     static async actualizar(data={}){
 
-        const { nombre, password, maxUser, id } = data
+        const { nombre, id } = data
 
         try {
-            await query(`update grupos set nombre="${ nombre }",password_="${ password }",usuarios_max=${parseInt(maxUser)}
-            where id=${parseInt(id)}`);
+            const results = await query(`update grupos set nombre="${ nombre }" where id=${ parseInt(id) }`);
 
-            return true;
+            return results
         } catch (error) {
             console.log(error);
             throw error
@@ -74,10 +73,10 @@ module.exports = class {
         }
     }
 
-    static async addContact (grupo,contacto){
+    static async addContact ( grupo, alias, numero ){
         try {
-            const rows = await query(`insert into contactos_grupo(id_grupo,id_contacto) 
-            values(${grupo},${contacto})`);
+            const rows = await query(`insert into contactos_grupo(id_grupo, alias, numero ) 
+            values(${ grupo },"${ alias }",${ numero })`);
 
             return rows
         } catch (error) {

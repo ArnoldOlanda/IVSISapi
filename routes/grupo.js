@@ -1,6 +1,6 @@
 const { Router } = require ('express');
 const { check } = require('express-validator');
-const { getGrupos,postGrupo,deleteGrupo, getFindGrupoByQuery } = require('../controllers/grupo');
+const { getGrupos,postGrupo,deleteGrupo, getFindGrupoByQuery, putGrupo } = require('../controllers/grupo');
 const { existeGrupoId } = require('../helpers/dbValidator');
 
 const { 
@@ -28,11 +28,11 @@ router.post   ('/',[
 
 ], postGrupo )
 
-// router.put    ('/:id',[
-//     check( 'id','No es un ID valido' ).isNumeric(),
-//     check( 'id' ).custom( existeUsuarioId ),
-//     validarCampos
-// ], putUser )
+router.put    ('/:id',[
+    check( 'id','No es un ID valido' ).isNumeric(),
+    check( 'id' ).custom( existeGrupoId ),
+    validarCampos
+], putGrupo )
 
 router.delete ('/:id',
     check( 'id','No es un ID valido' ).isNumeric(),

@@ -30,28 +30,24 @@ create table usuario(
 -- alter table usuario add column notif_token varchar(255);
 -- describe usuario
 
-create table contactos(
-	id int auto_increment,
-    nombre varchar(100) not null,
-    numero varchar(12),
-    primary key(id)
-);
 
 -- drop table contactos_grupo
 create table contactos_grupo(
 	id int auto_increment,
     id_grupo int,
-    id_contacto int,
+    alias varchar(100),
+    numero varchar(12),
     primary key(id,id_grupo)
 );
-alter table contactos_grupo add foreign key (id_grupo) references grupos(id);
 
--- describe contactos_usuario
+
+-- drop table contactos_usuario
 create table contactos_usuario(
 	id int auto_increment,
     id_usuario int,
-    id_contacto int,
+    alias varchar(100),
+    numero varchar(12),
     primary key(id,id_usuario)
 );
-alter table contactos_usuario add foreign key (id_contacto) references usuario(id); 
+
 

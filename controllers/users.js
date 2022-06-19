@@ -83,21 +83,25 @@ module.exports={
 
     putContactsUser : async (req = request, res = response) => {
         const { id } = req.params
-        const { nombre, numero } = req.body
+        const { contactos } = req.body
         
         try {
+            if (!(contactos.length < 1)) {
+                contactos.forEach( async ( element ) => {
 
-            await Contacto.registrar({
-                nombre,
-                numero,
-                para:'usuario',
-                id
-            });
+                    const { nombre, numero } = element;
+
+                    await Usuario.addContact( id, nombre, numero );
+                
+                });
+            }
+
 
             res.json({
-                msg:"Contacto registrado"
+                msg:"Contacto(s) registrado(s)"
             })
         } catch (error) {
+            console.log(error);
             return res.status(400).json({
                 err:"Ocurrio un error hable con el administrador"
             })

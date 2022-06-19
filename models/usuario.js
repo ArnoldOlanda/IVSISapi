@@ -74,4 +74,16 @@ module.exports = class {
             return false
         }
     }
+
+    static async addContact ( usuario, alias, numero ){
+        try {
+            const rows = await query(`insert into contactos_usuario(id_usuario, alias, numero ) 
+            values(${ usuario },"${ alias }",${ numero })`);
+
+            return rows
+        } catch (error) {
+            console.log(error);
+            throw error
+        }
+    }
 }
